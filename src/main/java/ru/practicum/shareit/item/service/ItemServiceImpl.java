@@ -24,9 +24,9 @@ public class ItemServiceImpl implements ItemService {
     public Item update(Long itemId, Item item) {
         if (items.containsKey(itemId)) {
             Item itemOld = items.get(itemId);
-            Item newItem = new Item(itemId, item.getName() == null? itemOld.getName():item.getName(),
-                    item.getDescription() == null? itemOld.getDescription():item.getDescription(),
-                    item.getAvailable() == null? itemOld.getAvailable():item.getAvailable(),
+            Item newItem = new Item(itemId, item.getName() == null ? itemOld.getName() : item.getName(),
+                    item.getDescription() == null ? itemOld.getDescription() : item.getDescription(),
+                    item.getAvailable() == null ? itemOld.getAvailable() : item.getAvailable(),
                     itemOld.getUserId()
                     );
             items.put(itemId, newItem);

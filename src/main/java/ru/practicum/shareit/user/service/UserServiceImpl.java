@@ -26,17 +26,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete (Long userId) {
+    public void delete(Long userId) {
         users.remove(userId);
     }
 
     @Override
-    public User update (Long userId, User user) {
+    public User update(Long userId, User user) {
         if (users.containsKey(userId)) {
             checkDublicateEmail(user, userId);
             User userOld = users.get(userId);
-            User newUser = new User(userId, user.getName() == null? userOld.getName():user.getName(),
-                    user.getEmail() == null? userOld.getEmail():user.getEmail());
+            User newUser = new User(userId, user.getName() == null ? userOld.getName() : user.getName(),
+                    user.getEmail() == null ? userOld.getEmail() : user.getEmail());
             users.put(userId, newUser);
         }
         return users.get(userId);
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
     private void checkDublicateEmail(User userNew, Long userId) {
         for (User user: users.values()) {
-            if ((user.getEmail().equals(userNew.getEmail()) && !(user.getId().equals(userId))) && !(userNew.getEmail()==null) ) {
+            if ((user.getEmail().equals(userNew.getEmail()) && !(user.getId().equals(userId))) && !(userNew.getEmail() == null)) {
                 throw new EmailDublicateException("Пользователь с таким email уже существует: " + userNew.getEmail());
             }
         }

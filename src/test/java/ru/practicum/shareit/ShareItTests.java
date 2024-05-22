@@ -128,7 +128,7 @@ class ShareItTests {
 		User user1 = new User(null, "Name 1", "Email1@email.com");
 		User user1Created = userService.create(user1);
 
-		assertThrows(DataNotFoundException.class, () -> userService.checkUser(user1Created.getId()+1));
+		assertThrows(DataNotFoundException.class, () -> userService.checkUser(user1Created.getId() + 1));
 	}
 
 	@Test

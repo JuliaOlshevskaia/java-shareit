@@ -15,10 +15,10 @@ import java.util.List;
 public interface ItemMapper {
 
     @Mappings({
-            @Mapping(target="name", source="request.name"),
-            @Mapping(target="description", source="request.description"),
-            @Mapping(target="available", source="request.available"),
-            @Mapping(target="userId", source="userId")
+            @Mapping(target = "name", source = "request.name"),
+            @Mapping(target = "description", source = "request.description"),
+            @Mapping(target = "available", source = "request.available"),
+            @Mapping(target = "userId", source = "userId")
     })
     Item toItem(ItemDto request, Long userId);
 
