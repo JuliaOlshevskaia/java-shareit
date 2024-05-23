@@ -6,11 +6,12 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private HashMap<Long, Item> items = new HashMap<>();
-    Long generatedId = 0L;
+    private Map<Long, Item> items = new HashMap<>();
+    private Long generatedId = 0L;
 
     @Override
     public Item create(Item item) {
@@ -42,11 +43,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> getItemsByUserId(Long userId) {
         List<Item> itemsByUserId = new ArrayList<>();
-        for (Item item : items.values()) {
-            if (item.getUserId().equals(userId)) {
-                itemsByUserId.add(item);
-            }
-        }
+        items.values().stream().filter(f -> f.getUserId().equals(userId)).forEach(a -> itemsByUserId.add(a));
         return itemsByUserId;
     }
 
@@ -54,12 +51,9 @@ public class ItemServiceImpl implements ItemService {
     public List<Item> getSearchItems(String text) {
         List<Item> itemsSearched = new ArrayList<>();
         if (!text.isBlank()) {
-            for (Item item : items.values()) {
-                if ((item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase()))
-                && item.getAvailable()) {
-                    itemsSearched.add(item);
-                }
-            }
+            items.values().stream().filter(f -> (f.getName().toLowerCase().contains(text.toLowerCase()) ||
+                    f.getDescription().toLowerCase().contains(text.toLowerCase()))
+                    && f.getAvailable()).forEach(a -> itemsSearched.add(a));
         }
         return itemsSearched;
     }

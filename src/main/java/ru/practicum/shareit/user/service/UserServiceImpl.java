@@ -9,11 +9,12 @@ import ru.practicum.shareit.user.dto.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private HashMap<Long, User> users = new HashMap<>();
-    Long generatedId = 0L;
+    private Map<Long, User> users = new HashMap<>();
+    private Long generatedId = 0L;
 
     @Override
     public User create(User user) {
@@ -54,11 +55,8 @@ public class UserServiceImpl implements UserService {
 
 
     private void checkDublicateEmail(String emailNew) {
-        for (User user: users.values()) {
-            if (user.getEmail().equals(emailNew)) {
-                throw new EmailDublicateException("Пользователь с таким email уже существует: " + emailNew);
-            }
-        }
+       users.values().stream().filter(f -> f.getEmail().equals(emailNew))
+                .forEach(a -> {throw new EmailDublicateException("Пользователь с таким email уже существует: " + emailNew);});
     }
 
     private void validate(User user) {
@@ -71,11 +69,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkDublicateEmail(User userNew, Long userId) {
-        for (User user: users.values()) {
-            if ((user.getEmail().equals(userNew.getEmail()) && !(user.getId().equals(userId))) && !(userNew.getEmail() == null)) {
-                throw new EmailDublicateException("Пользователь с таким email уже существует: " + userNew.getEmail());
-            }
-        }
+        users.values().stream().filter(f ->
+                (f.getEmail().equals(userNew.getEmail()) && !(f.getId().equals(userId))) && !(userNew.getEmail() == null))
+                .forEach(a -> {throw new EmailDublicateException("Пользователь с таким email уже существует: " + userNew.getEmail());});
     }
 
     @Override

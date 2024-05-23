@@ -10,16 +10,16 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-@Mapper(componentModel = "spring")
+
+@Mapper(componentModel = SPRING)
 public interface ItemMapper {
 
-    @Mappings({
-            @Mapping(target = "name", source = "request.name"),
-            @Mapping(target = "description", source = "request.description"),
-            @Mapping(target = "available", source = "request.available"),
-            @Mapping(target = "userId", source = "userId")
-    })
+    @Mapping(target = "name", source = "request.name")
+    @Mapping(target = "description", source = "request.description")
+    @Mapping(target = "available", source = "request.available")
+    @Mapping(target = "userId", source = "userId")
     Item toItem(ItemDto request, Long userId);
 
     Item toItem(ItemUpdateDto request);
