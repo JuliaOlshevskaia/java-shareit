@@ -56,7 +56,9 @@ public class UserServiceImpl implements UserService {
 
     private void checkDublicateEmail(String emailNew) {
        users.values().stream().filter(f -> f.getEmail().equals(emailNew))
-                .forEach(a -> {throw new EmailDublicateException("Пользователь с таким email уже существует: " + emailNew);});
+                .forEach(a -> {
+                    throw new EmailDublicateException("Пользователь с таким email уже существует: " + emailNew);
+                });
     }
 
     private void validate(User user) {
@@ -71,7 +73,9 @@ public class UserServiceImpl implements UserService {
     private void checkDublicateEmail(User userNew, Long userId) {
         users.values().stream().filter(f ->
                 (f.getEmail().equals(userNew.getEmail()) && !(f.getId().equals(userId))) && !(userNew.getEmail() == null))
-                .forEach(a -> {throw new EmailDublicateException("Пользователь с таким email уже существует: " + userNew.getEmail());});
+                .forEach(a -> {
+                    throw new EmailDublicateException("Пользователь с таким email уже существует: " + userNew.getEmail());
+                });
     }
 
     @Override
