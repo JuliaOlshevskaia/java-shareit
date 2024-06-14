@@ -3,14 +3,11 @@ package ru.practicum.shareit.item.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemResponse;
-import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
-
 import javax.validation.Valid;
 import java.util.List;
 
@@ -34,7 +31,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemResponse update(@Valid @RequestBody ItemUpdateDto request, @PathVariable Long itemId,
                                @RequestHeader("X-Sharer-User-Id") Long userId) {
-        if (!service.getItemById(itemId).getUserId().equals(userId)) {
+        if (!service.getItemById(itemId, userId).getUserId().equals(userId)) {
             throw new DataNotFoundException("Пользователь, меняющий вещь, не ее владелец");
         }
         Item item = mapper.toItem(request);
@@ -43,8 +40,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemResponse getItemById(@PathVariable Long itemId) {
-        Item modified = service.getItemById(itemId);
+    public ItemResponse getItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        Item modified = service.getItemById(itemId, userId);
         return mapper.toResponse(modified);
     }
 
@@ -58,5 +55,10 @@ public class ItemController {
     public List<ItemResponse> getSearchItems(@RequestParam("text") String text, @RequestHeader("X-Sharer-User-Id") Long userId) {
         List<Item> items = service.getSearchItems(text);
         return mapper.toListResponse(items);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public Comment createComment(@Valid @RequestBody CommentDto comment, @PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        return service.createComment(comment.getText(), itemId, userId);
     }
 }
