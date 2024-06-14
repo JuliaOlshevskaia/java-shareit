@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(schema="public", name="comments")
+@Table(schema = "public", name = "comments")
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable = false, updatable = false, unique = true)
+    @Column(name = "id", nullable = false, updatable = false, unique = true)
     private Long id;
 
-    @Column(name="text", nullable = false)
+    @Column(name = "text", nullable = false)
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,6 +30,6 @@ public class CommentEntity {
     @JoinColumn(name = "author_id", nullable = false)
     private UserEntity author;
 
-    @Column(name="created", nullable = false)
+    @Column(name = "created", nullable = false)
     private LocalDateTime created;
 }

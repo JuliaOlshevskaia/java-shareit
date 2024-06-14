@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(schema="public", name="bookings")
+@Table(schema = "public", name = "bookings")
 public class BookingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable = false, updatable = false, unique = true)
+    @Column(name = "id", nullable = false, updatable = false, unique = true)
     private Long id;
 
-    @Column(name="start_date", nullable = false)
+    @Column(name = "start_date", nullable = false)
     private LocalDateTime start;
 
-    @Column(name="end_date", nullable = false)
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -11,20 +11,20 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(schema="public", name="items")
+@Table(schema = "public", name = "items")
 public class ItemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable = false, updatable = false, unique = true)
+    @Column(name = "id", nullable = false, updatable = false, unique = true)
     private Long id;
 
-    @Column(name="name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name="description", nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name="is_available", nullable = false)
+    @Column(name = "is_available", nullable = false)
     private Boolean available;
 
     @ManyToOne(fetch = FetchType.LAZY)
