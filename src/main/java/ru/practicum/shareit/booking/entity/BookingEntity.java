@@ -1,14 +1,17 @@
 package ru.practicum.shareit.booking.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(schema = "public", name = "bookings")
 public class BookingEntity {
@@ -33,4 +36,17 @@ public class BookingEntity {
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass() || ((BookingEntity) o).id == null || this.id == null) return false;
+        BookingEntity that = (BookingEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

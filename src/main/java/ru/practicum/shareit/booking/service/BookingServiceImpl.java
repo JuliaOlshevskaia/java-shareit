@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.dto.Booking;
@@ -21,13 +20,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    @Autowired
-    private BookingRepository bookingRepository;
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
     private final BookingMapper mapper;
+
+    private static final String ALL_BOOKINGS = "ALL";
+    private static final String CURRENT_BOOKINGS = "CURRENT";
+    private static final String PAST_BOOKINGS = "PAST";
+    private static final String FUTURE_BOOKINGS = "FUTURE";
+    private static final String WAITING_BOOKINGS = "WAITING";
+    private static final String REJECTED_BOOKINGS = "REJECTED";
 
     @Override
     public BookingEntity create(Booking booking) {
@@ -80,22 +83,22 @@ public class BookingServiceImpl implements BookingService {
         UserEntity user = userRepository.findById(userId).get();
         LocalDateTime timeNow = LocalDateTime.now();
         switch (text) {
-            case ("ALL") :
+            case (ALL_BOOKINGS) :
                 bookings = bookingRepository.findAllByBookerOrderByStartDesc(user);
                 break;
-            case ("CURRENT") :
+            case (CURRENT_BOOKINGS) :
                 bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartDesc(user, timeNow, timeNow);
                 break;
-            case ("PAST") :
+            case (PAST_BOOKINGS) :
                 bookings = bookingRepository.findAllByBookerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now());
                 break;
-            case ("FUTURE") :
+            case (FUTURE_BOOKINGS) :
                 bookings = bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(user, LocalDateTime.now());
                 break;
-            case ("WAITING") :
+            case (WAITING_BOOKINGS) :
                 bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(user, BookingStatus.WAITING);
                 break;
-            case ("REJECTED") :
+            case (REJECTED_BOOKINGS) :
                 bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(user, BookingStatus.REJECTED);
                 break;
             default:
@@ -110,22 +113,22 @@ public class BookingServiceImpl implements BookingService {
         UserEntity user = userRepository.findById(userId).get();
         LocalDateTime timeNow = LocalDateTime.now();
         switch (text) {
-            case ("ALL") :
+            case (ALL_BOOKINGS) :
                 bookings = bookingRepository.findAllByItemOwnerOrderByStartDesc(user);
                 break;
-            case ("CURRENT") :
+            case (CURRENT_BOOKINGS) :
                 bookings = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfterOrderByStartDesc(user, timeNow, timeNow);
                 break;
-            case ("PAST") :
+            case (PAST_BOOKINGS) :
                 bookings = bookingRepository.findAllByItemOwnerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now());
                 break;
-            case ("FUTURE") :
+            case (FUTURE_BOOKINGS) :
                 bookings = bookingRepository.findAllByItemOwnerAndStartAfterOrderByStartDesc(user, LocalDateTime.now());
                 break;
-            case ("WAITING") :
+            case (WAITING_BOOKINGS) :
                 bookings = bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(user, BookingStatus.WAITING);
                 break;
-            case ("REJECTED") :
+            case (REJECTED_BOOKINGS) :
                 bookings = bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(user, BookingStatus.REJECTED);
                 break;
             default:

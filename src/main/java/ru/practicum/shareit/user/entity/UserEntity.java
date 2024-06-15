@@ -1,10 +1,13 @@
 package ru.practicum.shareit.user.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(schema = "public", name = "users")
 public class UserEntity {
@@ -18,4 +21,17 @@ public class UserEntity {
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass() || ((UserEntity) o).id == null || this.id == null) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email);
+    }
 }

@@ -1,16 +1,16 @@
 package ru.practicum.shareit.item.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.user.entity.UserEntity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
-@Data
-@Entity
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(schema = "public", name = "items")
 public class ItemEntity {
     @Id
@@ -30,4 +30,17 @@ public class ItemEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private UserEntity owner;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass() || ((ItemEntity) o).id == null || this.id == null) return false;
+        ItemEntity that = (ItemEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
