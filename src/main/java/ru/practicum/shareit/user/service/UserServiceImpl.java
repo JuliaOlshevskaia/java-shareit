@@ -1,65 +1,22 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.exceptions.EmailDublicateException;
 import ru.practicum.shareit.exceptions.ValidationException;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.dto.User;
+import ru.practicum.shareit.user.entity.UserEntity;
+import ru.practicum.shareit.user.mapper.UserMapper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private Map<Long, User> users = new HashMap<>();
-    private Long generatedId = 0L;
-
-    @Override
-    public User create(User user) {
-        validate(user);
-        checkDublicateEmail(user.getEmail());
-        ++generatedId;
-        user.setId(generatedId);
-        users.put(generatedId, user);
-        return users.get(generatedId);
-    }
-
-    @Override
-    public void delete(Long userId) {
-        users.remove(userId);
-    }
-
-    @Override
-    public User update(Long userId, User user) {
-        if (users.containsKey(userId)) {
-            checkDublicateEmail(user, userId);
-            User userOld = users.get(userId);
-            User newUser = new User(userId, user.getName() == null ? userOld.getName() : user.getName(),
-                    user.getEmail() == null ? userOld.getEmail() : user.getEmail());
-            users.put(userId, newUser);
-        }
-        return users.get(userId);
-    }
-
-    @Override
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
-    }
-
-    @Override
-    public User getUserById(Long userId) {
-        return users.get(userId);
-    }
-
-
-    private void checkDublicateEmail(String emailNew) {
-       users.values().stream().filter(f -> f.getEmail().equals(emailNew))
-                .forEach(a -> {
-                    throw new EmailDublicateException("Пользователь с таким email уже существует: " + emailNew);
-                });
-    }
+    private final UserRepository userRepository;
+    private final UserMapper mapper;
 
     private void validate(User user) {
         if (user.getName() == null) {
@@ -70,17 +27,47 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void checkDublicateEmail(User userNew, Long userId) {
-        users.values().stream().filter(f ->
-                (f.getEmail().equals(userNew.getEmail()) && !(f.getId().equals(userId))) && !(userNew.getEmail() == null))
-                .forEach(a -> {
-                    throw new EmailDublicateException("Пользователь с таким email уже существует: " + userNew.getEmail());
-                });
+    @Override
+    public User create(User user) {
+        validate(user);
+        UserEntity userEntity = mapper.toEntity(user);
+        UserEntity userCreated = userRepository.save(userEntity);
+        return mapper.toUser(userCreated);
+    }
+
+    @Override
+    public void delete(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    @Override
+    public User update(Long userId, User user) {
+        if (userRepository.existsById(userId)) {
+            UserEntity userOld = userRepository.findById(userId).get();
+            User newUser = new User(userId, user.getName() == null ? userOld.getName() : user.getName(),
+                    user.getEmail() == null ? userOld.getEmail() : user.getEmail());
+            UserEntity userNewEntity = mapper.toEntity(newUser);
+            userRepository.save(userNewEntity);
+        }
+        return mapper.toUser(userRepository.findById(userId).get());
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        List<UserEntity> allUsers = userRepository.findAll();
+        return allUsers.stream().map(mapper::toUser).collect(Collectors.toList());
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        checkUser(userId);
+        UserEntity userEntity = userRepository.findById(userId).get();
+        return mapper.toUser(userEntity);
     }
 
     @Override
     public void checkUser(Long userId) {
-        if (!users.containsKey(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new DataNotFoundException("Пользователя с id=" + userId + " не существует");
         }
     }
