@@ -2,12 +2,13 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingShortInfo;
-import ru.practicum.shareit.item.dto.Comment;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Item {
 
     private Long id;
@@ -26,4 +27,5 @@ public class Item {
 
     private List<Comment> comments;
 
+    private Long requestId;
 }

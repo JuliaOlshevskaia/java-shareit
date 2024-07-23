@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.item.entity.ItemEntity;
@@ -13,6 +15,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(schema = "public", name = "bookings")
 public class BookingEntity {
     @Id

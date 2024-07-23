@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -16,6 +18,8 @@ import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.dto.Item;
+import ru.practicum.shareit.requests.entity.RequestsEntity;
+import ru.practicum.shareit.requests.repository.RequestsRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.entity.UserEntity;
 
@@ -32,6 +36,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final RequestsRepository requestsRepository;
     private final ItemMapper mapper;
     private final CommentMapper commentMapper;
 
@@ -39,6 +44,10 @@ public class ItemServiceImpl implements ItemService {
     public Item create(Item item) {
         ItemEntity itemEntity = mapper.toEntity(item);
         UserEntity user = userRepository.findById(item.getUserId()).get();
+        if (item.getRequestId() != null) {
+            RequestsEntity request = requestsRepository.findById(item.getRequestId()).get();
+            itemEntity.setRequests(request);
+        }
         itemEntity.setOwner(user);
         ItemEntity itemCreated = itemRepository.save(itemEntity);
         return mapper.toItem(itemCreated);
@@ -51,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
             ItemEntity newItem = new ItemEntity(itemId, item.getName() == null ? itemOld.getName() : item.getName(),
                     item.getDescription() == null ? itemOld.getDescription() : item.getDescription(),
                     item.getAvailable() == null ? itemOld.getAvailable() : item.getAvailable(),
-                    itemOld.getOwner()
+                    itemOld.getOwner(), itemOld.getRequests()
             );
             itemRepository.save(newItem);
         }
@@ -87,6 +96,34 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public List<Item> getItemsByUserId(Long userId, Integer from, Integer size) {
+        Pageable pageParam = PageRequest.of(from > 0 ? from / size : 0, size);
+        UserEntity user = userRepository.findById(userId).get();
+        List<ItemEntity> itemEntities = itemRepository.findAllByOwnerOrderById(user, pageParam);
+        Map<Long, Item> itemMap = new HashMap<>();
+        itemEntities.forEach(i -> itemMap.put(i.getId(), mapper.toItem(i)));
+        List<BookingEntity> lastBooking = bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(itemEntities, LocalDateTime.now());
+        List<BookingEntity> nextBooking = bookingRepository.findFirstByItemInAndStartAfterOrderByStart(itemEntities, LocalDateTime.now());
+
+        lastBooking.forEach(i -> {
+            if (itemMap.get(i.getItem().getId()).getLastBooking() == null) {
+                Item item = itemMap.get(i.getItem().getId());
+                item.setLastBooking(new BookingShortInfo(i.getId(), i.getBooker().getId()));
+                itemMap.put(item.getId(), item);
+            }
+        });
+
+        nextBooking.forEach(i -> {
+            if (itemMap.get(i.getItem().getId()).getNextBooking() == null) {
+                Item item = itemMap.get(i.getItem().getId());
+                item.setNextBooking(new BookingShortInfo(i.getId(), i.getBooker().getId()));
+                itemMap.put(item.getId(), item);
+            }
+        });
+        return new ArrayList<>(itemMap.values());
+    }
+
+    @Override
     public List<Item> getItemsByUserId(Long userId) {
         UserEntity user = userRepository.findById(userId).get();
         List<ItemEntity> itemEntities = itemRepository.findAllByOwnerOrderById(user);
@@ -111,6 +148,16 @@ public class ItemServiceImpl implements ItemService {
             }
         });
         return new ArrayList<>(itemMap.values());
+    }
+
+    @Override
+    public List<Item> getSearchItems(String text, Integer from, Integer size) {
+        Pageable pageParam = PageRequest.of(from > 0 ? from / size : 0, size);
+        List<Item> itemsSearched = new ArrayList<>();
+        if (!text.isBlank()) {
+            itemsSearched = mapper.toListItem(itemRepository.search(text, pageParam));
+        }
+        return itemsSearched;
     }
 
     @Override

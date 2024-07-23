@@ -9,6 +9,8 @@ import ru.practicum.shareit.item.dto.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -31,6 +33,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemResponse update(@Valid @RequestBody ItemUpdateDto request, @PathVariable Long itemId,
                                @RequestHeader("X-Sharer-User-Id") Long userId) {
+        userService.checkUser(userId);
         if (!service.getItemById(itemId, userId).getUserId().equals(userId)) {
             throw new DataNotFoundException("Пользователь, меняющий вещь, не ее владелец");
         }
@@ -46,14 +49,29 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponse> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        List<Item> items = service.getItemsByUserId(userId);
+    public List<ItemResponse> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                       @RequestParam(name = "from", required = false) @PositiveOrZero Integer from,
+                                       @RequestParam(name = "size", required = false) @Positive Integer size) {
+        List<Item> items;
+        if (from == null || size == null) {
+            items = service.getItemsByUserId(userId);
+        } else {
+            items = service.getItemsByUserId(userId, from, size);
+        }
         return mapper.toListResponse(items);
     }
 
     @GetMapping("/search")
-    public List<ItemResponse> getSearchItems(@RequestParam("text") String text, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        List<Item> items = service.getSearchItems(text);
+    public List<ItemResponse> getSearchItems(@RequestParam("text") String text,
+                                             @RequestParam(name = "from", required = false) @PositiveOrZero Integer from,
+                                             @RequestParam(name = "size", required = false) @Positive Integer size,
+                                             @RequestHeader("X-Sharer-User-Id") Long userId) {
+        List<Item> items;
+        if (from == null || size == null) {
+            items = service.getSearchItems(text);
+        } else {
+            items = service.getSearchItems(text, from, size);
+        }
         return mapper.toListResponse(items);
     }
 

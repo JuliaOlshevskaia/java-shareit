@@ -12,6 +12,10 @@ public interface BookingService {
 
     BookingEntity getBookingById(Long bookingId, Long userId);
 
+    List<BookingEntity> getBookingsByUser(String text, Long userId, Integer from, Integer size);
+
+    List<BookingEntity> getBookingsByOwner(String text, Long userId, Integer from, Integer size);
+
     List<BookingEntity> getBookingsByUser(String text, Long userId);
 
     List<BookingEntity> getBookingsByOwner(String text, Long userId);

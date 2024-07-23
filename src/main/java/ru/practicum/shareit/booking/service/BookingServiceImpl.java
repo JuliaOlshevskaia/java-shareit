@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.dto.Booking;
@@ -78,6 +80,37 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<BookingEntity> getBookingsByUser(String text, Long userId, Integer from, Integer size) {
+        List<BookingEntity> bookings;
+        UserEntity user = userRepository.findById(userId).get();
+        LocalDateTime timeNow = LocalDateTime.now();
+        Pageable pageParam = PageRequest.of(from > 0 ? from / size : 0, size);
+        switch (text) {
+            case (ALL_BOOKINGS) :
+                bookings = bookingRepository.findAllByBookerOrderByStartDesc(user, pageParam);
+                break;
+            case (CURRENT_BOOKINGS) :
+                bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartDesc(user, timeNow, timeNow, pageParam);
+                break;
+            case (PAST_BOOKINGS) :
+                bookings = bookingRepository.findAllByBookerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now(), pageParam);
+                break;
+            case (FUTURE_BOOKINGS) :
+                bookings = bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(user, LocalDateTime.now(), pageParam);
+                break;
+            case (WAITING_BOOKINGS) :
+                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(user, BookingStatus.WAITING, pageParam);
+                break;
+            case (REJECTED_BOOKINGS) :
+                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(user, BookingStatus.REJECTED, pageParam);
+                break;
+            default:
+                throw new ValidationException("Unknown state: " + text);
+        }
+        return bookings;
+    }
+
+    @Override
     public List<BookingEntity> getBookingsByUser(String text, Long userId) {
         List<BookingEntity> bookings;
         UserEntity user = userRepository.findById(userId).get();
@@ -100,6 +133,37 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case (REJECTED_BOOKINGS) :
                 bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(user, BookingStatus.REJECTED);
+                break;
+            default:
+                throw new ValidationException("Unknown state: " + text);
+        }
+        return bookings;
+    }
+
+    @Override
+    public List<BookingEntity> getBookingsByOwner(String text, Long userId, Integer from, Integer size) {
+        List<BookingEntity> bookings;
+        UserEntity user = userRepository.findById(userId).get();
+        LocalDateTime timeNow = LocalDateTime.now();
+        Pageable pageParam = PageRequest.of(from > 0 ? from / size : 0, size);
+        switch (text) {
+            case (ALL_BOOKINGS) :
+                bookings = bookingRepository.findAllByItemOwnerOrderByStartDesc(user, pageParam);
+                break;
+            case (CURRENT_BOOKINGS) :
+                bookings = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfterOrderByStartDesc(user, timeNow, timeNow, pageParam);
+                break;
+            case (PAST_BOOKINGS) :
+                bookings = bookingRepository.findAllByItemOwnerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now(), pageParam);
+                break;
+            case (FUTURE_BOOKINGS) :
+                bookings = bookingRepository.findAllByItemOwnerAndStartAfterOrderByStartDesc(user, LocalDateTime.now(), pageParam);
+                break;
+            case (WAITING_BOOKINGS) :
+                bookings = bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(user, BookingStatus.WAITING, pageParam);
+                break;
+            case (REJECTED_BOOKINGS) :
+                bookings = bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(user, BookingStatus.REJECTED, pageParam);
                 break;
             default:
                 throw new ValidationException("Unknown state: " + text);
@@ -142,7 +206,6 @@ public class BookingServiceImpl implements BookingService {
             throw new DataNotFoundException("Пользователь id=" + userId + " не владелец вещи id=" + booking.getItem().getId());
         }
     }
-
 
     private void validate(Booking booking) {
         if (booking.getEnd().isBefore(LocalDateTime.now())) {

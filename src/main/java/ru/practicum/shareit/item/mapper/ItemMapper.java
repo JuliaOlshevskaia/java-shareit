@@ -2,11 +2,9 @@ package ru.practicum.shareit.item.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.practicum.shareit.item.dto.ItemResponse;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.entity.ItemEntity;
-import ru.practicum.shareit.item.dto.Item;
+
 import java.util.List;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
@@ -30,7 +28,14 @@ public interface ItemMapper {
     ItemEntity toEntity(Item item);
 
     @Mapping(target = "userId", source = "itemEntity.owner.id")
+    @Mapping(target = "requestId", source = "itemEntity.requests.id")
     Item toItem(ItemEntity itemEntity);
 
     List<Item> toListItem(List<ItemEntity> items);
+
+    @Mapping(target = "requestId", source = "itemEntity.requests.id")
+    ItemForRequestsResponse toItemForRequestsResponse(ItemEntity itemEntity);
+
+    @Mapping(target = "requestId", source = "itemEntity.requests.id")
+    List<ItemForRequestsResponse> toListItemForRequestsResponse(List<ItemEntity> itemEntity);
 }

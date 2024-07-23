@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -12,8 +13,11 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+@Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/bookings")
@@ -46,15 +50,29 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingResponse> getBookingsByUser(@RequestParam(name = "state", required = false, defaultValue = "ALL") String text,
+                                          @RequestParam(name = "from", required = false) @PositiveOrZero Integer from,
+                                                   @RequestParam(name = "size", required = false) @Positive Integer size,
                                           @RequestHeader("X-Sharer-User-Id") Long userId) {
-        List<BookingEntity> bookings = service.getBookingsByUser(text, userId);
+        List<BookingEntity> bookings;
+        if (from == null || size == null) {
+            bookings = service.getBookingsByUser(text, userId);
+        } else {
+            bookings = service.getBookingsByUser(text, userId, from, size);
+        }
         return mapper.toListBookingResponse(bookings);
     }
 
     @GetMapping("/owner")
     public List<BookingResponse> getBookingsByOwner(@RequestParam(name = "state", required = false, defaultValue = "ALL") String text,
+                                                    @RequestParam(name = "from", required = false) @PositiveOrZero Integer from,
+                                                    @RequestParam(name = "size", required = false) @Positive Integer size,
                                                     @RequestHeader("X-Sharer-User-Id") Long userId) {
-        List<BookingEntity> bookings = service.getBookingsByOwner(text, userId);
+        List<BookingEntity> bookings;
+        if (from == null || size == null) {
+            bookings = service.getBookingsByOwner(text, userId);
+        } else {
+            bookings = service.getBookingsByOwner(text, userId, from, size);
+        }
         return mapper.toListBookingResponse(bookings);
     }
 

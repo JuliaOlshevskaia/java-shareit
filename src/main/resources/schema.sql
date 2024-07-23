@@ -11,13 +11,22 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT UQ_USER_EMAIL UNIQUE (email)
     );
 
+create table if not exists requests
+(
+    id int not null primary key auto_increment,
+    description VARCHAR(255),
+    requestor_id int references users(id),
+    created TIMESTAMP WITHOUT TIME ZONE not null
+);
+
 create table if not exists items
 (
     id int not null primary key auto_increment,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(512) NOT NULL,
     is_available boolean,
-    owner_id int references users(id)
+    owner_id int references users(id),
+    requests_id int references requests(id)
 );
 
 create table if not exists bookings (
@@ -37,3 +46,5 @@ create table if not exists comments
     author_id int references users(id),
     created TIMESTAMP WITHOUT TIME ZONE not null
 );
+
+
