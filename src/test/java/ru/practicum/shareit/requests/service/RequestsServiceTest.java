@@ -115,6 +115,6 @@ public class RequestsServiceTest {
     @Test
     void checkRequests() {
         when(requestsRepository.existsById(any())).thenReturn(false);
-        assertThrows(DataNotFoundException.class, () -> {service.checkRequests(requests.getId());});
+        assertThrows(DataNotFoundException.class, () -> service.checkRequests(requests.getId()));
     }
 }

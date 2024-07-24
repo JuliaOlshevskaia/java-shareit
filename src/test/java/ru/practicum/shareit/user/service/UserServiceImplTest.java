@@ -59,7 +59,7 @@ public class UserServiceImplTest {
 
         assertThat(targetUsers, hasSize(sourceUsers.size()));
         for (User sourceUser : sourceUsers) {
-            assertThat (targetUsers, hasItem(allOf(
+            assertThat(targetUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
                     hasProperty("name", equalTo(sourceUser.getName())),
                     hasProperty("email", equalTo(sourceUser.getEmail()))
