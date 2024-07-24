@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.user.dto.User;
@@ -138,6 +137,6 @@ public class UserServiceTest {
     void checkUser() {
         when(repository.existsById(any())).thenReturn(false);
 
-        assertThrows(DataNotFoundException.class, () -> {service.checkUser(1L);});
+        assertThrows(DataNotFoundException.class, () -> service.checkUser(1L));
     }
 }

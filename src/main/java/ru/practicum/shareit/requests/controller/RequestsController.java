@@ -56,8 +56,8 @@ public class RequestsController {
     @GetMapping("/all")
     public List<RequestsResponse> getRequestByPage(@Valid RequestsParamByPage requestsParamByPage,
                                                    @RequestHeader("X-Sharer-User-Id") Long userId) {
-        if ((requestsParamByPage.getSize() != null && requestsParamByPage.getSize()<=0) ||
-                (requestsParamByPage.getFrom() != null && requestsParamByPage.getFrom()<0)) {
+        if ((requestsParamByPage.getSize() != null && requestsParamByPage.getSize() <= 0) ||
+                (requestsParamByPage.getFrom() != null && requestsParamByPage.getFrom() < 0)) {
             throw new ValidationException("Неверный размер запроса");
         }
         userService.checkUser(userId);

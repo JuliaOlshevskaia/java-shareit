@@ -21,7 +21,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class RequestsServiceImpl implements RequestsService{
+public class RequestsServiceImpl implements RequestsService {
     private final RequestsRepository requestsRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;

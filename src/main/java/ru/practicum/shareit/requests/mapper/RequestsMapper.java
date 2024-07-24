@@ -23,10 +23,12 @@ public interface RequestsMapper {
 
     @Mapping(target = "requestorId", source = "requestor.id")
     Requests toRequests(RequestsEntity requestsEntity);
+
     RequestsResponse toResponse(Requests requests);
 
     @Mapping(target = "items.requestId", source = "items.requests.id")
     @Mapping(target = "requestorId", source = "requestor.id")
     List<Requests> toListRequests(List<RequestsEntity> requestsEntity);
+
     List<RequestsResponse> toListResponse(List<Requests> requests);
 }

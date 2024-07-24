@@ -59,7 +59,7 @@ public class UserServiceImplTest {
 
         assertThat(targetUsers, hasSize(sourceUsers.size()));
         for (User sourceUser : sourceUsers) {
-            assertThat(targetUsers, hasItem( allOf(
+            assertThat (targetUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
                     hasProperty("name", equalTo(sourceUser.getName())),
                     hasProperty("email", equalTo(sourceUser.getEmail()))
@@ -114,7 +114,7 @@ public class UserServiceImplTest {
 
         assertThat(targetUsers, hasSize(sourceUsersWithoutId2.size()));
         for (User sourceUser : sourceUsersWithoutId2) {
-            assertThat(targetUsers, hasItem( allOf(
+            assertThat(targetUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
                     hasProperty("name", equalTo(sourceUser.getName())),
                     hasProperty("email", equalTo(sourceUser.getEmail()))
@@ -153,7 +153,7 @@ public class UserServiceImplTest {
 
         assertThat(targetUsers, hasSize(newSourceUsers.size()));
         for (User sourceUser : newSourceUsers) {
-            assertThat(targetUsers, hasItem( allOf(
+            assertThat(targetUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
                     hasProperty("name", equalTo(sourceUser.getName())),
                     hasProperty("email", equalTo(sourceUser.getEmail()))
