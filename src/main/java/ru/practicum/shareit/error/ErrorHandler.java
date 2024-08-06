@@ -1,5 +1,6 @@
 package ru.practicum.shareit.error;
 
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 
+@Generated
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {

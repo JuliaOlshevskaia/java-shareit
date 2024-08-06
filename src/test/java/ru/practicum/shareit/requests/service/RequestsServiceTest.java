@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +46,14 @@ public class RequestsServiceTest {
             "Name",
             "email@mail.com");
     private RequestsEntity requestsEntity = new RequestsEntity(1L, "Request", userEntity, LocalDateTime.now(), null);
+    private ItemEntity itemEntity = new ItemEntity(
+            1L,
+            "Name",
+            "Description",
+            true,
+            userEntity, requestsEntity);
+
+
 
     @BeforeEach
     void setUp() {
@@ -85,6 +94,26 @@ public class RequestsServiceTest {
     }
 
     @Test
+    void getRequestsByUserWithItem() {
+        requestsEntity.setItems(Set.of(itemEntity));
+
+        List<RequestsEntity> requestsEntityList = List.of(requestsEntity);
+        List<ItemEntity> itemEntityList = List.of(itemEntity);
+
+        when(itemRepository.findAllByRequestsIn(any())).thenReturn(itemEntityList);
+        when(requestsRepository.findAllByRequestorIdOrderByCreatedDesc(any())).thenReturn(requestsEntityList);
+
+        var result = service.getRequestsByUser(user.getId());
+
+        assertNotNull(result);
+        assertEquals(requestsEntity.getId(), result.get(0).getId());
+        assertEquals(requestsEntity.getDescription(), result.get(0).getDescription());
+        assertEquals(requestsEntity.getRequestor().getId(), result.get(0).getRequestorId());
+        assertEquals(requestsEntity.getCreated(), result.get(0).getCreated());
+        assertEquals(itemEntity.getId(), result.get(0).getItems().get(0).getId());
+    }
+
+    @Test
     void getRequestsById() {
         when(requestsRepository.findById(any())).thenReturn(Optional.ofNullable(requestsEntity));
 
@@ -95,6 +124,22 @@ public class RequestsServiceTest {
         assertEquals(requestsEntity.getDescription(), result.getDescription());
         assertEquals(requestsEntity.getRequestor().getId(), result.getRequestorId());
         assertEquals(requestsEntity.getCreated(), result.getCreated());
+    }
+
+    @Test
+    void getRequestsByIdWithItem() {
+        requestsEntity.setItems(Set.of(itemEntity));
+
+        when(requestsRepository.findById(any())).thenReturn(Optional.ofNullable(requestsEntity));
+
+        var result = service.getRequestsById(requests.getId());
+
+        assertNotNull(result);
+        assertEquals(requestsEntity.getId(), result.getId());
+        assertEquals(requestsEntity.getDescription(), result.getDescription());
+        assertEquals(requestsEntity.getRequestor().getId(), result.getRequestorId());
+        assertEquals(requestsEntity.getCreated(), result.getCreated());
+        assertEquals(itemEntity.getId(), result.getItems().get(0).getId());
     }
 
     @Test

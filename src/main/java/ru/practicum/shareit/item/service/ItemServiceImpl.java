@@ -69,9 +69,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item getItemById(Long itemId, Long userId) {
-        if (!itemRepository.existsById(itemId)) {
-            throw new DataNotFoundException("Вещи с id=" + itemId + " не существует");
-        }
+        checkItem(itemId);
         ItemEntity itemEntity = itemRepository.findById(itemId).get();
         Item item = mapper.toItem(itemEntity);
 

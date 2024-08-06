@@ -1,11 +1,13 @@
 package ru.practicum.shareit.requests.dto;
 
 import lombok.Data;
+import lombok.Generated;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+@Generated
 @Data
 @Validated
 public class RequestsParamByPage {

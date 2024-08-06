@@ -2,11 +2,13 @@ package ru.practicum.shareit.requests.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import ru.practicum.shareit.item.dto.ItemForRequestsResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Generated
 @Data
 @AllArgsConstructor
 public class RequestsResponse {

@@ -81,9 +81,6 @@ public class RequestsServiceImpl implements RequestsService {
     public List<Requests> getRequestsByPage(Integer from, Integer size, Long userId) {
         Pageable pageParam = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by(Sort.Direction.DESC, "created"));
         List<RequestsEntity> requestsEntities = requestsRepository.findAllByRequestorIdIsNot(userId, pageParam);
-        if (requestsEntities.size() > 0) {
-            int i = 3;
-        }
         List<Requests> requests = mapper.toListRequests(requestsEntities);
         requests.stream().filter(f -> f.getItems() != null).forEach(i -> i.getItems().forEach(e -> e.setRequestId(i.getId())));
         return requests;

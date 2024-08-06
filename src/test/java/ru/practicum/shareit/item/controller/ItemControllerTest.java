@@ -21,8 +21,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ItemController.class)
 public class ItemControllerTest {
@@ -106,6 +105,45 @@ public class ItemControllerTest {
                 true,
                 1L,
                 null, null, null, null));
+        when(itemService.getSearchItems(text)).thenReturn(items);
+
+        List<ItemResponse> itemResponses = new ArrayList<>();
+        itemResponses.add(new ItemResponse(
+                1L,
+                "Name",
+                "Description",
+                true,
+                null, null, null, null));
+
+        when(itemMapper.toListResponse(items)).thenReturn(itemResponses);
+
+
+        mvc.perform(get("/items/search")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("text", text)
+                        .content(mapper.writeValueAsString(itemResponse))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    void getSearchItemsWithSize() throws Exception {
+        String text = "test";
+        Integer from = 0;
+        Integer size = 10;
+        Long userId = 1L;
+
+        List<Item> items = new ArrayList<>();
+        items.add(new Item(
+                1L,
+                "Name",
+                "Description test",
+                true,
+                1L,
+                null, null, null, null));
         items.add(new Item(
                 2L,
                 "Name2",
@@ -170,6 +208,26 @@ public class ItemControllerTest {
     }
 
     @Test
+    void updateNotUserThrowException() throws Exception {
+        Long itemId = 1L;
+        Long userId = 1L;
+
+        Mockito.doNothing().when(userService).checkUser(any());
+        when(itemService.update(itemId, item)).thenReturn(item);
+        when(itemMapper.toItem(itemUpdateDto)).thenReturn(item);
+        when(itemMapper.toResponse(item)).thenReturn(itemResponse);
+        when(itemService.getItemById(any(), any())).thenReturn(item);
+
+        mvc.perform(patch("/items/1")
+                        .header("X-Sharer-User-Id", 3L)
+                        .content(mapper.writeValueAsString(itemResponse))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getItems() throws Exception {
         Long userId = 1L;
 
@@ -216,6 +274,46 @@ public class ItemControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    void getItemsWithSize() throws Exception {
+        Long userId = 1L;
+
+        List<Item> items = new ArrayList<>();
+        items.add(new Item(
+                1L,
+                "Name",
+                "Description",
+                true,
+                1L,
+                null, null, null, null));
+
+        List<ItemResponse> itemResponses = new ArrayList<>();
+        itemResponses.add(new ItemResponse(
+                1L,
+                "Name",
+                "Description",
+                true,
+                null, null, null, null));
+        Integer from = 0;
+        Integer size = 1;
+
+        when(itemService.getItemsByUserId(any(), any(), any()))
+                .thenReturn(items);
+        when(itemMapper.toListResponse(items))
+                .thenReturn(itemResponses);
+
+        mvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(1))
+                        .content(mapper.writeValueAsString(itemResponse))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
     }
 
     @Test

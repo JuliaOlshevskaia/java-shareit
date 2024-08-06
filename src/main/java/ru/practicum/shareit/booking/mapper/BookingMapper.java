@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.mapper;
 
+import lombok.Generated;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.dto.Booking;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
+@Generated
 @Mapper(componentModel = SPRING)
 public interface BookingMapper {
     @Mapping(target = "bookerId", source = "userId")

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.requests.mapper;
 
+import lombok.Generated;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.shareit.requests.dto.Requests;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-
+@Generated
 @Mapper(componentModel = SPRING)
 public interface RequestsMapper {
     @Mapping(target = "description", source = "description")

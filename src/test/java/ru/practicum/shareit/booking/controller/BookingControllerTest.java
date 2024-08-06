@@ -196,6 +196,35 @@ public class BookingControllerTest {
     }
 
     @Test
+    void getBookingsByUserWithSize() throws Exception {
+        String text = "ALL";
+        Integer from = 0;
+        Integer size = 1;
+
+        List<BookingResponse> bookingResponseList = new ArrayList<>();
+        bookingResponseList.add(bookingResponse);
+        List<BookingEntity> bookingEntityList = new ArrayList<>();
+        bookingEntityList.add(bookingEntity);
+
+        when(bookingMapper.toListBookingResponse(bookingEntityList))
+                .thenReturn(bookingResponseList);
+        when(bookingService.getBookingsByUser(text, userId, from, size))
+                .thenReturn(bookingEntityList);
+
+        mvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("text", text)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size))
+                        .content(mapper.writeValueAsString(bookingResponseList))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(bookingResponseList.size()));
+    }
+
+    @Test
     void getBookingsByOwner() throws Exception {
         List<BookingResponse> bookingResponseList = new ArrayList<>();
         bookingResponseList.add(bookingResponse);
@@ -209,6 +238,35 @@ public class BookingControllerTest {
 
         mvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", 1L)
+                        .content(mapper.writeValueAsString(bookingResponseList))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(bookingResponseList.size()));
+    }
+
+    @Test
+    void getBookingsByOwnerWithSize() throws Exception {
+        String text = "ALL";
+        Integer from = 0;
+        Integer size = 1;
+
+        List<BookingResponse> bookingResponseList = new ArrayList<>();
+        bookingResponseList.add(bookingResponse);
+        List<BookingEntity> bookingEntityList = new ArrayList<>();
+        bookingEntityList.add(bookingEntity);
+
+        when(bookingMapper.toListBookingResponse(bookingEntityList))
+                .thenReturn(bookingResponseList);
+        when(bookingService.getBookingsByOwner(text, userId, from, size))
+                .thenReturn(bookingEntityList);
+
+        mvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("text", text)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size))
                         .content(mapper.writeValueAsString(bookingResponseList))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

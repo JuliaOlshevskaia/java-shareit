@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.entity.UserEntity;
 import javax.persistence.*;
 import java.util.Objects;
 
+@Generated
 @Getter
 @Setter
 @AllArgsConstructor

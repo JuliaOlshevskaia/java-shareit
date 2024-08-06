@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.dto.User;
 import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -50,8 +51,25 @@ public class UserServiceTest {
     }
 
     @Test
-    void getById() {
+    void creatNullNameThrowException() {
+        var user = new User(null, null, "mail1@yandex.ru");
+        var userWithId = new UserEntity();
+        userWithId.setId(1L);
+        userWithId.setEmail("mail1@yandex.ru");
+        when(repository.save(any())).thenReturn(userWithId);
 
+        assertThrows(ValidationException.class, () -> service.create(user));
+    }
+
+    @Test
+    void creatNullEmailThrowException() {
+        var user = new User(null, "Name1", null);
+        var userWithId = new UserEntity();
+        userWithId.setId(1L);
+        userWithId.setName("Name1");
+        when(repository.save(any())).thenReturn(userWithId);
+
+        assertThrows(ValidationException.class, () -> service.create(user));
     }
 
     @Test

@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import ru.practicum.shareit.booking.dto.BookingShortInfo;
 import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.Comment;
 import ru.practicum.shareit.item.dto.Item;
 import ru.practicum.shareit.item.entity.CommentEntity;
@@ -17,6 +19,7 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.requests.entity.RequestsEntity;
 import ru.practicum.shareit.requests.repository.RequestsRepository;
 import ru.practicum.shareit.user.dto.User;
 import ru.practicum.shareit.user.entity.UserEntity;
@@ -86,6 +89,46 @@ public class ItemServiceTest {
     }
 
     @Test
+    void createWithRequest() {
+        UserEntity userRequestorEntity = new UserEntity(
+                2L,
+                "Name2",
+                "email2@mail.com");
+        RequestsEntity requestsEntity = new RequestsEntity(1L, "Request", userRequestorEntity, LocalDateTime.now(), null);
+
+        var item = new Item(null, "Name1", "description1", true, 1L,
+                null, null, null, requestsEntity.getId());
+        var user = new UserEntity();
+        user.setId(1L);
+        user.setName("Name1");
+        user.setEmail("mail1@yandex.ru");
+
+        var itemEntity = new ItemEntity();
+        itemEntity.setName("Name1");
+        itemEntity.setDescription("description1");
+        itemEntity.setAvailable(true);
+        itemEntity.setOwner(user);
+        itemEntity.setRequests(requestsEntity);
+
+        var itemWithId = new ItemEntity();
+        itemWithId.setId(1L);
+        itemWithId.setName("Name1");
+        itemWithId.setDescription("description1");
+        itemWithId.setAvailable(true);
+        itemWithId.setOwner(user);
+        itemWithId.setRequests(requestsEntity);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(itemRepository.save(any())).thenReturn(itemWithId);
+        when(requestsRepository.findById(anyLong())).thenReturn(Optional.of(requestsEntity));
+
+        var result = service.create(item);
+        assertNotNull(result);
+        assertEquals(itemWithId.getId(), result.getId());
+        assertEquals(itemWithId.getRequests().getId(), result.getRequestId());
+    }
+
+    @Test
     public void testUpdate() {
         Long itemId = 1L;
         Item item = new Item(itemId, "New Name", "New Description",true, null, null, null, null, null);
@@ -139,6 +182,99 @@ public class ItemServiceTest {
     }
 
     @Test
+    public void getItemByIdWithLastAndNextBooking() {
+        Long itemId = 1L;
+        Long userId = 2L;
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setId(itemId);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+        userEntity.setName("Name");
+        userEntity.setEmail("mail@yandex.ru");
+        itemEntity.setOwner(userEntity);
+        UserEntity bookerEntity = new UserEntity(
+                3L,
+                "Booker",
+                "booker@mail.com");
+        BookingEntity bookingEntityLast = new BookingEntity(
+                1L,
+                LocalDateTime.now().minusHours(2),
+                LocalDateTime.now().minusHours(1),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+        BookingEntity bookingEntityNext = new BookingEntity(
+                2L,
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+
+        when(itemRepository.existsById(itemId)).thenReturn(true);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(itemEntity));
+        when(bookingRepository.findFirstByItemIdAndEndBeforeOrderByStartDesc(any(), any())).thenReturn(bookingEntityLast);
+        when(bookingRepository.findFirstByItemIdAndStartAfterOrderByStart(any(), any())).thenReturn(bookingEntityNext);
+        when(commentRepository.findAllByItemId(itemId)).thenReturn(null);
+
+        Item item = service.getItemById(itemId, userId);
+
+        assertNotNull(item);
+        assertEquals(itemId, item.getId());
+        assertEquals(userId, item.getUserId());
+        assertEquals(bookingEntityLast.getId(), item.getLastBooking().getId());
+        assertEquals(bookingEntityNext.getId(), item.getNextBooking().getId());
+    }
+
+    @Test
+    public void getItemByIdWithNowBooking() {
+        Long itemId = 1L;
+        Long userId = 2L;
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setId(itemId);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+        userEntity.setName("Name");
+        userEntity.setEmail("mail@yandex.ru");
+        itemEntity.setOwner(userEntity);
+        UserEntity bookerEntity = new UserEntity(
+                3L,
+                "Booker",
+                "booker@mail.com");
+        BookingEntity bookingEntityNow = new BookingEntity(
+                1L,
+                LocalDateTime.now().minusHours(2),
+                LocalDateTime.now().plusMinutes(20),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+        BookingEntity bookingEntityNext = new BookingEntity(
+                2L,
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+
+        when(itemRepository.existsById(itemId)).thenReturn(true);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(itemEntity));
+        when(bookingRepository.findFirstByItemIdAndEndBeforeOrderByStartDesc(any(), any())).thenReturn(null);
+        when(bookingRepository.findFirstByItemIdAndStartBeforeOrderByStartDesc(any(), any())).thenReturn(bookingEntityNow);
+        when(bookingRepository.findFirstByItemIdAndStartAfterOrderByStart(any(), any())).thenReturn(bookingEntityNext);
+        when(commentRepository.findAllByItemId(itemId)).thenReturn(null);
+
+        Item item = service.getItemById(itemId, userId);
+
+        assertNotNull(item);
+        assertEquals(itemId, item.getId());
+        assertEquals(userId, item.getUserId());
+        assertEquals(bookingEntityNow.getId(), item.getLastBooking().getId());
+        assertEquals(bookingEntityNext.getId(), item.getNextBooking().getId());
+    }
+
+    @Test
     public void testGetItemsByUserIdWithSize() {
         Long userId = 1L;
         Integer from = 0;
@@ -165,6 +301,67 @@ public class ItemServiceTest {
     }
 
     @Test
+    public void testGetItemsByUserIdWithSizeAndLastAndNextBooking() {
+        Long userId = 1L;
+        Integer from = 0;
+        Integer size = 10;
+        Long itemId = 1L;
+
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+        user.setName("Name");
+        user.setEmail("mail@yandex.ru");
+
+//        List<ItemEntity> itemEntities = new ArrayList<>();
+        Item item = new Item(itemId, null, null, null, userId, null, null, null, null);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setId(itemId);
+        List<ItemEntity> itemEntities = List.of(itemEntity);
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+        userEntity.setName("Name");
+        userEntity.setEmail("mail@yandex.ru");
+
+        itemEntity.setOwner(userEntity);
+        UserEntity bookerEntity = new UserEntity(
+                3L,
+                "Booker",
+                "booker@mail.com");
+        BookingEntity bookingEntityLast = new BookingEntity(
+                1L,
+                LocalDateTime.now().minusHours(2),
+                LocalDateTime.now().plusMinutes(20),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+        BookingEntity bookingEntityNext = new BookingEntity(
+                2L,
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+        item.setLastBooking(new BookingShortInfo(bookingEntityLast.getId(), bookingEntityLast.getBooker().getId()));
+        item.setNextBooking(new BookingShortInfo(bookingEntityNext.getId(), bookingEntityNext.getBooker().getId()));
+        List<Item> items = List.of(item);
+
+        Pageable pageParam = PageRequest.of(from > 0 ? from / size : 0, size);
+
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+        when(itemRepository.findAllByOwnerOrderById(user, pageParam)).thenReturn(itemEntities);
+        when(bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(anyList(), any(LocalDateTime.class))).thenReturn(List.of(bookingEntityLast));
+        when(bookingRepository.findFirstByItemInAndStartAfterOrderByStart(anyList(), any(LocalDateTime.class))).thenReturn(List.of(bookingEntityNext));
+
+        List<Item> result = service.getItemsByUserId(userId, from, size);
+
+        assertEquals(items, result);
+        assertNotNull(result.get(0).getLastBooking());
+        assertNotNull(result.get(0).getNextBooking());
+    }
+
+    @Test
     public void testGetItemsByUserId() {
         Long userId = 1L;
         UserEntity user = new UserEntity();
@@ -181,6 +378,62 @@ public class ItemServiceTest {
         List<Item> result = service.getItemsByUserId(userId);
 
         assertEquals(items, result);
+    }
+
+    @Test
+    public void testGetItemsByUserIdWithLastAndNextBooking() {
+        Long userId = 1L;
+        Long itemId = 1L;
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+        user.setName("Name");
+        user.setEmail("mail@yandex.ru");
+
+//        List<ItemEntity> itemEntities = new ArrayList<>();
+        Item item = new Item(itemId, null, null, null, userId, null, null, null, null);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setId(itemId);
+        List<ItemEntity> itemEntities = List.of(itemEntity);
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+        userEntity.setName("Name");
+        userEntity.setEmail("mail@yandex.ru");
+
+        itemEntity.setOwner(userEntity);
+        UserEntity bookerEntity = new UserEntity(
+                3L,
+                "Booker",
+                "booker@mail.com");
+        BookingEntity bookingEntityLast = new BookingEntity(
+                1L,
+                LocalDateTime.now().minusHours(2),
+                LocalDateTime.now().plusMinutes(20),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+        BookingEntity bookingEntityNext = new BookingEntity(
+                2L,
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2),
+                itemEntity,
+                bookerEntity,
+                BookingStatus.APPROVED);
+        item.setLastBooking(new BookingShortInfo(bookingEntityLast.getId(), bookingEntityLast.getBooker().getId()));
+        item.setNextBooking(new BookingShortInfo(bookingEntityNext.getId(), bookingEntityNext.getBooker().getId()));
+        List<Item> items = List.of(item);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(itemRepository.findAllByOwnerOrderById(user)).thenReturn(itemEntities);
+        when(bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(any(), any())).thenReturn(List.of(bookingEntityLast));
+        when(bookingRepository.findFirstByItemInAndStartAfterOrderByStart(any(), any())).thenReturn(List.of(bookingEntityNext));
+
+        List<Item> result = service.getItemsByUserId(userId);
+
+        assertEquals(items, result);
+        assertNotNull(result.get(0).getLastBooking());
+        assertNotNull(result.get(0).getNextBooking());
     }
 
     @Test
@@ -287,5 +540,47 @@ public class ItemServiceTest {
         var result = service.createComment(text, 1L, 1L);
 
         assertEquals(comment, result);
+    }
+
+    @Test
+    void createCommentNotBookerThrowException() {
+        String text = "text";
+        LocalDateTime timeCreateComment = LocalDateTime.now();
+        User user = new User(
+                1L,
+                "Name",
+                "email@mail.com");
+        UserEntity userEntity = new UserEntity(
+                1L,
+                "Name",
+                "email@mail.com");
+
+        Item item = new Item(
+                null,
+                "Name",
+                "Description",
+                true,
+                1L,
+                null, null, null, null);
+
+        ItemEntity itemEntity = new ItemEntity(
+                1L,
+                "Name",
+                "Description",
+                true,
+                userEntity, null);
+
+        BookingEntity booking = new BookingEntity(1L, LocalDateTime.now(), LocalDateTime.now().minusSeconds(1),
+                itemEntity, userEntity, BookingStatus.APPROVED);
+        List<BookingEntity> bookingEntityList = new ArrayList<>();
+        CommentEntity commentEntity = new CommentEntity(1L, text, itemEntity, userEntity, timeCreateComment);
+        Comment comment = new Comment(1L, text, user.getName(), timeCreateComment);
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(userEntity));
+        when(itemRepository.findById(any())).thenReturn(Optional.of(itemEntity));
+        when(bookingRepository.findAllByBookerAndEndBeforeAndStatusAndItem(any(), any(), any(), any())).thenReturn(bookingEntityList);
+        when(commentRepository.save(any())).thenReturn(commentEntity);
+
+        assertThrows(ValidationException.class, () -> service.createComment(text, 1L, 1L));
     }
 }

@@ -113,13 +113,28 @@ public class RequestsControllerTest {
         when(requestsService.getRequestsByPage(anyInt(), anyInt(), anyLong())).thenReturn(requestsList);
         when(requestsMapper.toListResponse(requestsList)).thenReturn(responseList);
 
-        mvc.perform(get("/requests/all?from=0&size=1")
+        mvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", 1L)
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(1))
                         .content(mapper.writeValueAsString(responseList))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(responseList.size()));
+    }
+
+    @Test
+    void getRequestByPageWrongSizeThrowException() throws Exception {
+        mvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(-1))
+                        .content(mapper.writeValueAsString(responseList))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

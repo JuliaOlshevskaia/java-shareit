@@ -34,6 +34,7 @@ public class ItemController {
     public ItemResponse update(@Valid @RequestBody ItemUpdateDto request, @PathVariable Long itemId,
                                @RequestHeader("X-Sharer-User-Id") Long userId) {
         userService.checkUser(userId);
+        Item a = service.getItemById(itemId, userId);
         if (!service.getItemById(itemId, userId).getUserId().equals(userId)) {
             throw new DataNotFoundException("Пользователь, меняющий вещь, не ее владелец");
         }
