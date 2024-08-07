@@ -30,7 +30,7 @@ public class UserServiceImplTest {
 
     @Test
     void create() {
-        User user = new User(null, "Name", "email@yandex.ru");
+        User user = new User(null, "Name", "emaillll@yandex.ru");
         service.create(user);
 
         TypedQuery<UserEntity> query = em.createQuery("Select u from UserEntity u where u.email = :email", UserEntity.class);
