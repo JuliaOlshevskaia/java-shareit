@@ -100,7 +100,7 @@ public class BookingServiceImplTest {
                 null,
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusDays(1),
-                1L,
+                 itemEntity.getId(),
                  bookerCreated.getId(),
                 BookingStatus.WAITING);
 

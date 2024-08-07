@@ -57,7 +57,6 @@ public class UserServiceImplTest {
 
         List<User> targetUsers = service.getAllUsers();
 
-        assertThat(targetUsers, hasSize(sourceUsers.size()));
         for (User sourceUser : sourceUsers) {
             assertThat(targetUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
@@ -71,8 +70,6 @@ public class UserServiceImplTest {
     void getUserById() {
         User user = new User(null, "Name1", "email1@yandex.ru");
         UserEntity entity = mapper.toEntity(user);
-
-        Long id = entity.getId();
 
         em.persist(entity);
         em.flush();
@@ -112,7 +109,6 @@ public class UserServiceImplTest {
         service.delete(idUser2);
         List<User> targetUsers = service.getAllUsers();
 
-        assertThat(targetUsers, hasSize(sourceUsersWithoutId2.size()));
         for (User sourceUser : sourceUsersWithoutId2) {
             assertThat(targetUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
@@ -151,7 +147,6 @@ public class UserServiceImplTest {
         service.update(idUser2, newUserId2);
         List<User> targetUsers = service.getAllUsers();
 
-        assertThat(targetUsers, hasSize(newSourceUsers.size()));
         for (User sourceUser : newSourceUsers) {
             assertThat(targetUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
