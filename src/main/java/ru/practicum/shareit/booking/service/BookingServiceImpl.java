@@ -139,7 +139,7 @@ public class BookingServiceImpl implements BookingService {
 
     private void checkUserIsOwner(BookingEntity booking, Long userId) {
         if (!booking.getItem().getOwner().getId().equals(userId)) {
-            throw new DataNotFoundException("Пользователь id=" + userId + " не владелец вещи id=" + booking.getItem().getId());
+            throw new ValidationException("Пользователь id=" + userId + " не владелец вещи id=" + booking.getItem().getId());
         }
     }
 
