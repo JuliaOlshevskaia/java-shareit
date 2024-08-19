@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareitserver.booking.dto.Booking;
 import ru.practicum.shareitserver.booking.entity.BookingEntity;
@@ -31,8 +32,9 @@ import static org.hamcrest.Matchers.*;
 
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest
+@AutoConfigureTestDatabase
 public class BookingServiceImplTest {
     private final EntityManager em;
     private final BookingService service;
@@ -218,9 +220,5 @@ public class BookingServiceImplTest {
         assertThat(bookings.get(0).getItem().getId(), equalTo(bookingEntity.getItem().getId()));
         MatcherAssert.assertThat(bookings.get(0).getBooker().getId(), equalTo(bookingEntity.getBooker().getId()));
         assertThat(bookings.get(0).getStatus(), equalTo(bookingEntity.getStatus()));
-    }
-
-    @Test
-    void testCreate() {
     }
 }

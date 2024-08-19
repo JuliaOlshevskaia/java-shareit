@@ -3,6 +3,7 @@ package ru.practicum.shareitserver.user.service;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareitserver.user.dto.User;
 import ru.practicum.shareitserver.user.entity.UserEntity;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
+@AutoConfigureTestDatabase
 public class UserServiceImplTest {
     private final EntityManager em;
     private final UserService service;
