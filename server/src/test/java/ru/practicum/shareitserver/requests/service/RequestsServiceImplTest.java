@@ -84,7 +84,7 @@ public class RequestsServiceImplTest {
         assertEquals(requestsGetting.size(), requestsList.size());
         assertThat(requestsGetting.get(0).getId(), equalTo(requestsEntityCreated.getId()));
         assertThat(requestsGetting.get(0).getDescription(), equalTo(requestsEntityCreated.getDescription()));
-        assertThat(requestsGetting.get(0).getRequestorId(), equalTo(requestsEntityCreated.getRequestor().getId())); // можно добавить время без милисекунд
+        assertThat(requestsGetting.get(0).getRequestorId(), equalTo(requestsEntityCreated.getRequestor().getId()));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class RequestsServiceImplTest {
 
         assertThat(requestsGetting.getId(), equalTo(requestsEntityCreated.getId()));
         assertThat(requestsGetting.getDescription(), equalTo(requestsEntityCreated.getDescription()));
-        assertThat(requestsGetting.getRequestorId(), equalTo(requestsEntityCreated.getRequestor().getId())); // можно добавить время без милисекунд
+        assertThat(requestsGetting.getRequestorId(), equalTo(requestsEntityCreated.getRequestor().getId()));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class RequestsServiceImplTest {
         assertEquals(requestsGetting.size(), requestsList.size());
         assertThat(requestsGetting.get(0).getId(), equalTo(requestsEntityCreated.getId()));
         assertThat(requestsGetting.get(0).getDescription(), equalTo(requestsEntityCreated.getDescription()));
-        assertThat(requestsGetting.get(0).getRequestorId(), equalTo(requestsEntityCreated.getRequestor().getId())); // можно добавить время без милисекунд
+        assertThat(requestsGetting.get(0).getRequestorId(), equalTo(requestsEntityCreated.getRequestor().getId()));
     }
 
     @Test

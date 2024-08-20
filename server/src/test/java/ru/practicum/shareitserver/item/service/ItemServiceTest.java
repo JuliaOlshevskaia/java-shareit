@@ -313,7 +313,6 @@ public class ItemServiceTest {
         user.setName("Name");
         user.setEmail("mail@yandex.ru");
 
-//        List<ItemEntity> itemEntities = new ArrayList<>();
         Item item = new Item(itemId, null, null, null, userId, null, null, null, null);
 
         ItemEntity itemEntity = new ItemEntity();
@@ -390,7 +389,6 @@ public class ItemServiceTest {
         user.setName("Name");
         user.setEmail("mail@yandex.ru");
 
-//        List<ItemEntity> itemEntities = new ArrayList<>();
         Item item = new Item(itemId, null, null, null, userId, null, null, null, null);
 
         ItemEntity itemEntity = new ItemEntity();

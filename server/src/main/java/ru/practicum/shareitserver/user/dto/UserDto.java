@@ -3,14 +3,9 @@ package ru.practicum.shareitserver.user.dto;
 import lombok.AllArgsConstructor;
 import lombok.Generated;
 import lombok.Getter;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.Email;
-
 
 @Generated
 @Getter
-@Validated
 @AllArgsConstructor
 public class UserDto {
 
@@ -18,6 +13,5 @@ public class UserDto {
 
     private final String name;
 
-    @Email
     private final String email;
 }

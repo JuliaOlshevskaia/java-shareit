@@ -87,11 +87,7 @@ public class UserServiceTest {
 
     @Test
     void delete() {
-        List<UserEntity> userEntities = new ArrayList<>();
         var user1 = new User(1L, "Name1", "mail1@yandex.ru");
-//        user1.setId(1L);
-//        user1.setName("Name1");
-//        user1.setEmail("mail1@yandex.ru");
         service.create(user1);
 
         var user2 = new User(2L, "Name2", "mail2@yandex.ru");
