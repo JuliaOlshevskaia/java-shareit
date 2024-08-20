@@ -10,9 +10,7 @@ import ru.practicum.shareitserver.user.entity.UserEntity;
 import ru.practicum.shareitserver.user.mapper.UserMapper;
 import ru.practicum.shareitserver.user.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
