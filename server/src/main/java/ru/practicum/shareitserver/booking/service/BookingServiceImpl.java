@@ -36,7 +36,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingEntity create(Booking booking) {
-        validate(booking);
         ItemEntity item = itemRepository.findById(booking.getItemId()).get();
         UserEntity user = userRepository.findById(booking.getBookerId()).get();
         if (item.getOwner().getId().equals(user.getId())) {
@@ -205,22 +204,6 @@ public class BookingServiceImpl implements BookingService {
         if (!booking.getItem().getOwner().getId().equals(userId)) {
             throw new ValidationException("Пользователь id=" + userId + " не владелец вещи id=" + booking.getItem().getId());
         }
-    }
-
-    private void validate(Booking booking) {
-        if (booking.getEnd().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Дата окончания в прошлом");
-        }
-        if (booking.getEnd().isBefore(booking.getStart())) {
-            throw new ValidationException("Дата окончания раньше даты начала");
-        }
-        if (booking.getEnd().equals(booking.getStart())) {
-            throw new ValidationException("Дата окончания и дата начала совпадает");
-        }
-        if (booking.getStart().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Дата старта в прошлом");
-        }
-
     }
 
     private void checkBooking(Long bookingId) {

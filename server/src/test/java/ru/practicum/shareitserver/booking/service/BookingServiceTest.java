@@ -163,63 +163,9 @@ public class BookingServiceTest {
     }
 
     @Test
-    void createWithEndDateBeforeStartDate() {
-        Booking bookingEndDateBeforeNow = new Booking(
-                7L,
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().minusHours(1),
-                1L,
-                2L,
-                BookingStatus.WAITING);
-
-        assertThrows(ValidationException.class, () -> service.create(bookingEndDateBeforeNow));
-    }
-
-    @Test
-    void createWithEndDateBeforeNow() {
-        Booking bookingEndDateBeforeNow = new Booking(
-                7L,
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().minusHours(1),
-                1L,
-                2L,
-                BookingStatus.WAITING);
-
-        assertThrows(ValidationException.class, () -> service.create(bookingEndDateBeforeNow));
-    }
-
-    @Test
-    void createWithEndDateEqualsStartDate() {
-        Booking bookingEndDateBeforeNow = new Booking(
-                7L,
-                LocalDateTime.now().minusHours(1),
-                LocalDateTime.now().minusHours(1),
-                1L,
-                2L,
-                BookingStatus.WAITING);
-
-        assertThrows(ValidationException.class, () -> service.create(bookingEndDateBeforeNow));
-    }
-
-    @Test
-    void createWithStartDateBeforeNow() {
-        Booking bookingEndDateBeforeNow = new Booking(
-                7L,
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().plusHours(1),
-                1L,
-                2L,
-                BookingStatus.WAITING);
-
-        assertThrows(ValidationException.class, () -> service.create(bookingEndDateBeforeNow));
-    }
-
-    @Test
     void createBookingOwnItemThrowException() {
         when(userRepository.findById(any())).thenReturn(Optional.of(userEntity));
         when(itemRepository.findById(any())).thenReturn(Optional.of(itemEntity));
-//        when(bookingRepository.save(any())).thenReturn(bookingEntityWithIdOwnItem);
-
         assertThrows(DataNotFoundException.class, () -> service.create(bookingOwnItem));
     }
 
